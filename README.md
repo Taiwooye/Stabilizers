@@ -11,6 +11,8 @@ local emergency services and communicating with a dispatcher.
   emergency professional.
 - Keeps the interaction local to the browser; it does not collect or save
   health details.
+- Includes sign-in, sign-up, and password-reset preview pages. Authentication
+  is not connected, and these forms do not send or save account details.
 
 ## Important safety limits
 

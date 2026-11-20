@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import SiteFooter from "./components/site-footer";
+import SiteHeader from "./components/site-header";
 
 const regions = [
   { code: "us", name: "United States", number: "911" },
@@ -24,32 +27,7 @@ export default function EmergencyStart() {
 
   return (
     <main>
-      <header className="site-header">
-        <a aria-label="Stabilizers home" className="brand" href="#">
-          <span aria-hidden="true" className="brand-mark">
-            <svg viewBox="0 0 32 32" fill="none">
-              <path
-                d="M4 17h6l3-8 5.2 15 3.2-9H28"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.4"
-              />
-            </svg>
-          </span>
-          <span>
-            <strong>stabilizers</strong>
-            <small>HELP ON THE MOVE</small>
-          </span>
-        </a>
-        <nav aria-label="Main navigation" className="main-nav">
-          <a href="#how-it-works">How it works</a>
-          <a href="#safety">Safety &amp; privacy</a>
-          <a className="nav-cta" href="#get-help">
-            Get help             <span aria-hidden="true">&#8599;</span>
-          </a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <section aria-labelledby="hero-title" className="hero">
         <div className="hero-copy">
@@ -66,9 +44,9 @@ export default function EmergencyStart() {
             Simple prompts to help you contact emergency services and share
             what matters while a professional guides you.
           </p>
-          <a className="button button-dark hero-button" href="#get-help">
+          <Link className="button button-dark hero-button" href="#get-help">
             Get emergency help             <span aria-hidden="true">&#8594;</span>
-          </a>
+          </Link>
           <p className="hero-note">
             If someone may be in immediate danger, call your local emergency
             number now.
@@ -101,9 +79,9 @@ export default function EmergencyStart() {
               emergency services directly and follow their instructions.
             </p>
           </div>
-          <a href="#get-help">
+          <Link href="#get-help">
             Go to emergency call options             <span aria-hidden="true">&#8595;</span>
-          </a>
+          </Link>
         </aside>
       </section>
 
@@ -263,21 +241,10 @@ export default function EmergencyStart() {
             place the call.
           </p>
         </div>
-        <a href="#get-help">Back to call options <span aria-hidden="true">&#8593;</span></a>
+        <Link href="#get-help">Back to call options <span aria-hidden="true">&#8593;</span></Link>
       </section>
 
-      <footer className="site-footer">
-        <a aria-label="Stabilizers home" className="brand footer-brand" href="#">
-          <span aria-hidden="true" className="brand-mark">
-            <svg viewBox="0 0 32 32" fill="none">
-              <path d="M4 17h6l3-8 5.2 15 3.2-9H28" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.4" />
-            </svg>
-          </span>
-          <span><strong>stabilizers</strong><small>HELP ON THE MOVE</small></span>
-        </a>
-        <p>Not a substitute for emergency services or professional medical advice.</p>
-        <a href="#safety">Safety &amp; privacy</a>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
