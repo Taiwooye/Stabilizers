@@ -108,10 +108,10 @@ export default function EmergencyStart() {
           <p className="eyebrow">BUILT FOR CLARITY</p>
           <h2 id="safety-title">Your privacy matters, especially here.</h2>
           <p>
-            This prototype does not save your issue or region selections.
-            Provider profiles are examples only, not registered professionals.
-            Emergency calls open your device&apos;s phone app; Stabilizers does
-            not receive or place them.
+            Demo account details stay in this browser; passwords are never
+            saved. Issue and region choices are not added to your demo profile.
+            Provider profiles are fictional, and emergency calls open your
+            device&apos;s phone app.
           </p>
         </div>
         <Link href="#emergency-call">Back to call options <span aria-hidden="true">&#8593;</span></Link>

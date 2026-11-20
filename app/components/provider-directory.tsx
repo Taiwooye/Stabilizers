@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import {
+  endDemoSession,
+  getDemoSessionSnapshot,
+  getServerDemoSessionSnapshot,
+  subscribeToDemoSession,
+  type DemoAccount,
+} from "./demo-auth";
 
 const regions = [
   { code: "us", name: "United States", number: "911" },
@@ -15,41 +22,107 @@ const issues = [
   {
     id: "emotional",
     label: "Anger, stress or emotional wellbeing",
-    description: "Explore therapist and counselor support.",
-    providerTypes: ["Therapist", "Counselor"],
+    description: "Therapists, counselors and mental health professionals.",
   },
   {
     id: "medical",
     label: "General health or a non-emergency concern",
-    description: "Explore doctor and nurse support.",
-    providerTypes: ["Doctor", "Nurse"],
+    description: "Doctors, nurses and general health professionals.",
   },
-] as const;
-
-const sampleProviders = [
-  { id: "therapist", issue: "emotional", type: "Therapist" },
-  { id: "counselor", issue: "emotional", type: "Counselor" },
-  { id: "doctor", issue: "medical", type: "Doctor" },
-  { id: "nurse", issue: "medical", type: "Nurse" },
+  {
+    id: "recovery",
+    label: "Movement, recovery or nutrition",
+    description: "Rehabilitation and day-to-day health support.",
+  },
+  {
+    id: "family",
+    label: "Family or day-to-day support",
+    description: "Family, community and care coordination.",
+  },
 ] as const;
 
 type IssueId = (typeof issues)[number]["id"];
 
+type DemoProvider = {
+  id: string;
+  name: string;
+  profession: string;
+  focus: string;
+  issues: IssueId[];
+};
+
+const sampleProviders: DemoProvider[] = [
+  { id: "demo-01", name: "Demo Profile 01", profession: "Therapist", focus: "Anger management", issues: ["emotional"] },
+  { id: "demo-02", name: "Demo Profile 02", profession: "Counselor", focus: "Stress and coping", issues: ["emotional", "family"] },
+  { id: "demo-03", name: "Demo Profile 03", profession: "Clinical psychologist", focus: "Emotional wellbeing", issues: ["emotional"] },
+  { id: "demo-04", name: "Demo Profile 04", profession: "Psychiatrist", focus: "Mental health", issues: ["emotional", "medical"] },
+  { id: "demo-05", name: "Demo Profile 05", profession: "Social worker", focus: "Community and family support", issues: ["emotional", "family"] },
+  { id: "demo-06", name: "Demo Profile 06", profession: "Psychotherapist", focus: "Emotional support", issues: ["emotional"] },
+  { id: "demo-07", name: "Demo Profile 07", profession: "Family therapist", focus: "Family relationships", issues: ["emotional", "family"] },
+  { id: "demo-08", name: "Demo Profile 08", profession: "Anger-management counselor", focus: "Managing anger", issues: ["emotional"] },
+  { id: "demo-09", name: "Demo Profile 09", profession: "General practitioner", focus: "Everyday health", issues: ["medical"] },
+  { id: "demo-10", name: "Demo Profile 10", profession: "Family doctor", focus: "General health", issues: ["medical", "family"] },
+  { id: "demo-11", name: "Demo Profile 11", profession: "Registered nurse", focus: "Nursing care", issues: ["medical"] },
+  { id: "demo-12", name: "Demo Profile 12", profession: "Nurse practitioner", focus: "Primary care", issues: ["medical"] },
+  { id: "demo-13", name: "Demo Profile 13", profession: "Pediatric nurse", focus: "Child health", issues: ["medical", "family"] },
+  { id: "demo-14", name: "Demo Profile 14", profession: "Community health worker", focus: "Community wellbeing", issues: ["medical", "family"] },
+  { id: "demo-15", name: "Demo Profile 15", profession: "Physical therapist", focus: "Movement and recovery", issues: ["recovery"] },
+  { id: "demo-16", name: "Demo Profile 16", profession: "Occupational therapist", focus: "Everyday activities", issues: ["recovery", "family"] },
+  { id: "demo-17", name: "Demo Profile 17", profession: "Dietitian", focus: "Nutrition", issues: ["recovery", "medical"] },
+  { id: "demo-18", name: "Demo Profile 18", profession: "Pharmacist", focus: "Medication questions", issues: ["medical", "recovery"] },
+  { id: "demo-19", name: "Demo Profile 19", profession: "Speech therapist", focus: "Communication support", issues: ["recovery", "family"] },
+  { id: "demo-20", name: "Demo Profile 20", profession: "Care coordinator", focus: "Care planning", issues: ["family", "recovery"] },
+];
+
+function isIssueId(value: string | null): value is IssueId {
+  return issues.some((issue) => issue.id === value);
+}
+
+function subscribeToLocation(onChange: () => void) {
+  window.addEventListener("popstate", onChange);
+  return () => window.removeEventListener("popstate", onChange);
+}
+
+function getLocationIssue() {
+  return new URLSearchParams(window.location.search).get("issue") ?? "";
+}
+
+function getServerLocationIssue() {
+  return "";
+}
+
 export default function ProviderDirectory() {
   const [regionCode, setRegionCode] = useState("");
-  const [issueId, setIssueId] = useState<IssueId | "">("");
+  const [chosenIssueId, setChosenIssueId] = useState<IssueId | "">("");
   const [providerType, setProviderType] = useState("all");
+  const [accountActionError, setAccountActionError] = useState("");
+  const session = useSyncExternalStore(
+    subscribeToDemoSession,
+    getDemoSessionSnapshot,
+    getServerDemoSessionSnapshot,
+  );
+  const locationIssue = useSyncExternalStore(
+    subscribeToLocation,
+    getLocationIssue,
+    getServerLocationIssue,
+  );
+  const demoAccount: DemoAccount | null = session.account;
+  const issueId = chosenIssueId || (isIssueId(locationIssue) ? locationIssue : "");
 
+  const selectedIssue = issues.find((issue) => issue.id === issueId);
   const region = regions.find((item) => item.code === regionCode);
-  const selectedIssue = issues.find((item) => item.id === issueId);
-  const providers = sampleProviders.filter(
-    (provider) =>
-      provider.issue === issueId &&
-      (providerType === "all" || provider.type === providerType),
+  const issueProviders = selectedIssue
+    ? sampleProviders.filter((provider) => provider.issues.includes(selectedIssue.id))
+    : [];
+  const providerTypes = Array.from(
+    new Set(issueProviders.map((provider) => provider.profession)),
+  );
+  const providers = issueProviders.filter(
+    (provider) => providerType === "all" || provider.profession === providerType,
   );
 
   function chooseIssue(id: IssueId) {
-    setIssueId(id);
+    setChosenIssueId(id);
     setProviderType("all");
   }
 
@@ -114,8 +187,8 @@ export default function ProviderDirectory() {
         <h2 id="providers-title">What kind of help are you looking for?</h2>
         <p>
           Choose an issue to see the kind of professional who may be relevant.
-          Provider browsing and accounts are demonstration-only and are not
-          connected to a real care service.
+          Fake demo account details stay in this browser. Profiles are examples
+          only, not a real care service.
         </p>
       </div>
 
@@ -135,72 +208,107 @@ export default function ProviderDirectory() {
         ))}
       </div>
 
+      {(session.error || accountActionError) && (
+        <p className="provider-session-error" role="alert">
+          {session.error || accountActionError}
+        </p>
+      )}
+
       {selectedIssue && (
         <div aria-live="polite" className="provider-gate">
-          <div className="provider-gate-copy">
-            <p className="eyebrow">ACCOUNT REQUIRED FOR A REAL DIRECTORY</p>
-            <h3>
-              Browse{" "}
-              {selectedIssue.providerTypes
-                .map((type) => `${type.toLowerCase()}s`)
-                .join(" and ")}{" "}
-              by issue
-            </h3>
-            <p>
-              Create an account or sign in to browse providers. Account access
-              and verified provider listings are not connected in this preview.
-            </p>
-            <div className="provider-auth-links">
-              <Link className="button button-dark" href="/sign-up">
-                Create account
-              </Link>
-              <Link className="provider-sign-in-link" href="/sign-in">
-                Sign in
-              </Link>
-            </div>
-          </div>
-
-          <div className="sample-directory">
-            <div className="sample-directory-heading">
-              <div>
-                <p className="eyebrow">DEMO ONLY</p>
-                <h3>Preview sample matches</h3>
+          {!demoAccount ? (
+            <div className="provider-gate-copy provider-gate-copy-locked">
+              <p className="eyebrow">SIGN IN TO BROWSE DEMO PROFILES</p>
+              <h3>See example matches for {selectedIssue.label.toLowerCase()}</h3>
+              <p>
+                Create a local demo account or sign in with one you already
+                created. Use fake information only.
+              </p>
+              <div className="provider-auth-links">
+                <Link
+                  className="button button-dark"
+                  href={`/sign-up?issue=${selectedIssue.id}`}
+                >
+                  Create demo account
+                </Link>
+                <Link
+                  className="provider-sign-in-link"
+                  href={`/sign-in?issue=${selectedIssue.id}`}
+                >
+                  Sign in
+                </Link>
               </div>
-              <span className="sample-badge">Not real providers</span>
             </div>
-            <p className="sample-disclaimer">
-              These examples are not registered or available professionals.
-              They have no contact details and cannot be booked.
-            </p>
-            <label htmlFor="provider-type">Filter by professional type</label>
-            <select
-              id="provider-type"
-              onChange={(event) => setProviderType(event.target.value)}
-              value={providerType}
-            >
-              <option value="all">All types</option>
-              {selectedIssue.providerTypes.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-            <ul className="sample-provider-list">
-              {providers.map((provider) => (
-                <li className="sample-provider" key={provider.id}>
-                  <span aria-hidden="true" className="sample-provider-mark">
-                    {provider.type.slice(0, 1)}
-                  </span>
-                  <span>
-                    <strong>Example {provider.type.toLowerCase()}</strong>
-                    <small>Sample profile · not registered or available</small>
-                  </span>
-                  <span className="sample-provider-type">{provider.type}</span>
-                </li>
-              ))}
-              {providers.length === 0 && (
-                <li className="sample-empty">No sample profiles match this filter.</li>
-              )}
-            </ul>
-          </div>
+          ) : (
+            <>
+              <div className="provider-gate-copy">
+                <p className="eyebrow">DEMO ACCOUNT</p>
+                <h3>Welcome, {demoAccount.name}</h3>
+                <p>
+                  Signed in as {demoAccount.email}. These sample profiles are
+                  fictional and cannot be contacted or booked.
+                </p>
+                <button
+                  className="provider-sign-out"
+                  onClick={() => {
+                    try {
+                      endDemoSession();
+                      setProviderType("all");
+                      setAccountActionError("");
+                    } catch {
+                      setAccountActionError("Could not sign out of this demo account.");
+                    }
+                  }}
+                  type="button"
+                >
+                  Sign out
+                </button>
+              </div>
+
+              <div className="sample-directory">
+                <div className="sample-directory-heading">
+                  <div>
+                    <p className="eyebrow">DEMO DIRECTORY</p>
+                    <h3>{providers.length} sample matches</h3>
+                  </div>
+                  <span className="sample-badge">Fictional profiles</span>
+                </div>
+                <p className="sample-disclaimer">
+                  These fictional profiles are not registered providers and have
+                  no availability, contact details, or booking.
+                </p>
+                <label htmlFor="provider-type">Filter by professional type</label>
+                <select
+                  id="provider-type"
+                  onChange={(event) => setProviderType(event.target.value)}
+                  value={providerType}
+                >
+                  <option value="all">All types</option>
+                  {providerTypes.map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+                <ul className="sample-provider-list">
+                  {providers.map((provider) => (
+                    <li className="sample-provider" key={provider.id}>
+                      <span aria-hidden="true" className="sample-provider-mark">
+                        {provider.profession.slice(0, 1)}
+                      </span>
+                      <span>
+                        <strong>{provider.name}</strong>
+                        <small>{provider.profession} · {provider.focus}</small>
+                        <small>Fictional profile · not registered or available</small>
+                      </span>
+                      <span className="sample-provider-type">{provider.profession}</span>
+                    </li>
+                  ))}
+                  {providers.length === 0 && (
+                    <li className="sample-empty">No sample profiles match this filter.</li>
+                  )}
+                </ul>
+              </div>
+            </>
+          )}
         </div>
       )}
 

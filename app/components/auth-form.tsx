@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { createDemoAccount, signInDemoAccount } from "./demo-auth";
 
 type AuthMode = "sign-in" | "sign-up" | "forgot-password";
 
@@ -33,24 +35,49 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
   const [status, setStatus] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const text = copy[mode];
+  const router = useRouter();
+
+  function getReturnPath() {
+    const issue = new URLSearchParams(window.location.search).get("issue");
+    const supportedIssues = ["emotional", "medical", "recovery", "family"];
+    return issue && supportedIssues.includes(issue)
+      ? `/?issue=${encodeURIComponent(issue)}#providers`
+      : "/#providers";
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("");
 
-    if (mode === "sign-up") {
-      const formData = new FormData(event.currentTarget);
-      if (formData.get("password") !== formData.get("confirm-password")) {
-        setStatus("Those passwords don’t match. Please check and try again.");
-        return;
-      }
+    if (mode === "forgot-password") {
+      setStatus("Password reset isn’t available in this local demo.");
+      return;
     }
 
-    setStatus(
-      mode === "forgot-password"
-        ? "Password reset isn’t available in this preview. Your email wasn’t sent or saved."
-        : "Account access isn’t connected in this preview. Your details weren’t sent or saved.",
-    );
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email"));
+
+    try {
+      if (mode === "sign-up") {
+        if (formData.get("password") !== formData.get("confirm-password")) {
+          setStatus("Those passwords don’t match. Please check and try again.");
+          return;
+        }
+
+        createDemoAccount(String(formData.get("name")), email);
+      } else if (!signInDemoAccount(email)) {
+        setStatus("No demo account was found for this email. Create an account first.");
+        return;
+      }
+
+      router.push(getReturnPath());
+    } catch (error) {
+      setStatus(
+        error instanceof Error && error.message.includes("already exists")
+          ? error.message
+          : "The demo account couldn’t be saved in this browser. Check browser storage and try again.",
+      );
+    }
   }
 
   return (
@@ -139,8 +166,10 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
 
           <p className="auth-preview-note">
             {mode === "forgot-password"
-              ? "This preview has no account service. Your email won’t be sent or saved."
-              : "This preview has no account service. Please don’t enter a real password."}
+              ? "This local demo does not send password-reset emails."
+              : mode === "sign-up"
+                ? "Demo only: use a made-up name and email. They stay in this browser; your password is never saved."
+                : "Use the email from your demo account. Any password works; it is never checked or saved."}
           </p>
           <button className="button button-dark auth-submit" type="submit">
             {text.button} <span aria-hidden="true">&#8594;</span>

@@ -8,12 +8,12 @@ local emergency services and communicating with a dispatcher.
 - Offers click-to-call links for commonly used emergency numbers in the United
   States, Canada, United Kingdom, Australia, and the European Union.
 - Provides a direct emergency-call option for supported regions and does not
-  store issue or region selections.
-- Includes issue-based provider category filters and clearly marked sample
-  profiles for preview only; accounts and provider registration are not
-  connected.
-- Includes sign-in, sign-up, and password-reset preview pages. Authentication
-  is not connected, and these forms do not send or save account details.
+  add issue or region selections to demo account details.
+- Includes 20 fictional provider profiles with issue and profession filters.
+- Includes a browser-local demo sign-up and sign-in flow. Use fake details
+  only; the demo stores a name and email locally, never stores passwords, and
+  is not real authentication. Demo providers are not registered or available.
+- Includes a password-reset preview page; it does not send emails.
 
 ## Important safety limits
 
