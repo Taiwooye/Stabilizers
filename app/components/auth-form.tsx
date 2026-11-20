@@ -185,7 +185,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
           Stabilizers helps you find the words and make a clear call. Emergency
           professionals are always the ones to guide care.
         </p>
-        <Link className="auth-emergency-link" href="/#get-help">
+        <Link className="auth-emergency-link" href="/#emergency-call">
           Go to emergency call options <span aria-hidden="true">&#8594;</span>
         </Link>
         <p className="auth-emergency-note">

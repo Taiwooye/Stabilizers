@@ -7,10 +7,11 @@ local emergency services and communicating with a dispatcher.
 
 - Offers click-to-call links for commonly used emergency numbers in the United
   States, Canada, United Kingdom, Australia, and the European Union.
-- Provides a short prompt for sharing location and the situation with the
-  emergency professional.
-- Keeps the interaction local to the browser; it does not collect or save
-  health details.
+- Provides a direct emergency-call option for supported regions and does not
+  store issue or region selections.
+- Includes issue-based provider category filters and clearly marked sample
+  profiles for preview only; accounts and provider registration are not
+  connected.
 - Includes sign-in, sign-up, and password-reset preview pages. Authentication
   is not connected, and these forms do not send or save account details.
 
