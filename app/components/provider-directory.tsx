@@ -231,12 +231,43 @@ export default function ProviderDirectory() {
                       <span aria-hidden="true" className="sample-provider-mark">
                         {provider.profession.slice(0, 1)}
                       </span>
-                      <span>
+                      <div className="sample-provider-info">
                         <strong>{provider.name}</strong>
                         <small>{provider.profession} · {provider.focus}</small>
                         <small>Fictional profile · not registered or available</small>
                         <CallModeIcons />
-                      </span>
+                        <details className="sample-profile-details">
+                          <summary>View profile</summary>
+                          <div className="sample-profile-panel">
+                            <p>
+                              Fictional demo profile focused on {provider.focus.toLowerCase()}.
+                            </p>
+                            <dl>
+                              <div>
+                                <dt>Profession</dt>
+                                <dd>{provider.profession}</dd>
+                              </div>
+                              <div>
+                                <dt>Area of focus</dt>
+                                <dd>{provider.focus}</dd>
+                              </div>
+                              <div>
+                                <dt>Relevant support</dt>
+                                <dd>
+                                  {issues
+                                    .filter((issue) => provider.issues.includes(issue.id))
+                                    .map((issue) => issue.label)
+                                    .join(", ")}
+                                </dd>
+                              </div>
+                            </dl>
+                            <p className="sample-profile-note">
+                              This profile is for preview only. Credentials,
+                              availability, bookings, and calls are not connected.
+                            </p>
+                          </div>
+                        </details>
+                      </div>
                       <span className="sample-provider-type">{provider.profession}</span>
                     </li>
                   ))}

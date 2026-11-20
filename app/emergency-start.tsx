@@ -20,7 +20,7 @@ export default function EmergencyStart() {
           <h1 id="hero-title">
             Stay steady.
             <br />
-            Get help moving.
+            <span className="hero-title-accent">Get help moving.</span>
           </h1>
           <p className="hero-description">
             Simple prompts to help you contact emergency services and share
