@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import ProviderDirectory from "./components/provider-directory";
+import EmergencyCallBanner from "./components/emergency-call-banner";
+import CallModeIcons from "./components/call-mode-icons";
 import SiteFooter from "./components/site-footer";
 import SiteHeader from "./components/site-header";
 
@@ -23,9 +24,9 @@ export default function EmergencyStart() {
           </h1>
           <p className="hero-description">
             Simple prompts to help you contact emergency services and share
-            what matters while a professional guides you.
+            important details with the dispatcher.
           </p>
-          <Link className="button button-dark hero-button" href="#providers">
+          <Link className="button button-dark hero-button" href="/providers">
             Find support             <span aria-hidden="true">&#8594;</span>
           </Link>
           <p className="hero-note">
@@ -66,7 +67,48 @@ export default function EmergencyStart() {
         </aside>
       </section>
 
-      <ProviderDirectory />
+      <EmergencyCallBanner />
+
+      <section aria-labelledby="support-options-title" className="home-support-section">
+        <div className="providers-heading">
+          <p className="eyebrow">SUPPORT FOR EVERY STEP</p>
+          <h2 id="support-options-title">Find the kind of support you need.</h2>
+          <p>
+            Choose a starting point, then sign in to browse the example provider
+            directory.
+          </p>
+        </div>
+        <div className="support-card-grid">
+          <Link className="support-card" href="/providers?issue=emotional">
+            <strong>Emotional wellbeing</strong>
+            <span>Therapists, counselors and mental health professionals</span>
+          </Link>
+          <Link className="support-card" href="/providers?issue=medical">
+            <strong>General health</strong>
+            <span>Doctors, nurses and general health professionals</span>
+          </Link>
+          <Link className="support-card" href="/providers?issue=recovery">
+            <strong>Recovery and movement</strong>
+            <span>Rehabilitation, movement and nutrition support</span>
+          </Link>
+          <Link className="support-card" href="/providers?issue=family">
+            <strong>Family and day-to-day support</strong>
+            <span>Community and care coordination</span>
+          </Link>
+        </div>
+      </section>
+
+      <section aria-labelledby="call-options-title" className="call-preview-panel home-call-preview">
+        <div>
+          <p className="eyebrow">FLEXIBLE WAYS TO CONNECT</p>
+          <h2 id="call-options-title">Audio and video call options</h2>
+          <p>
+            Call icons are included in this design preview. Audio and video
+            calls are not connected.
+          </p>
+        </div>
+        <CallModeIcons />
+      </section>
 
       <section aria-labelledby="steps-title" className="steps-section" id="how-it-works">
         <div className="steps-intro">

@@ -13,6 +13,8 @@ local emergency services and communicating with a dispatcher.
 - Includes a browser-local demo sign-up and sign-in flow. Use fake details
   only; the demo stores a name and email locally, never stores passwords, and
   is not real authentication. Demo providers are not registered or available.
+- Includes separate home, provider directory, account, about, and how-it-works
+  pages. Audio and video call icons are visual placeholders only.
 - Includes a password-reset preview page; it does not send emails.
 
 ## Important safety limits

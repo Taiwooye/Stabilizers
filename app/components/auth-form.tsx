@@ -41,8 +41,8 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
     const issue = new URLSearchParams(window.location.search).get("issue");
     const supportedIssues = ["emotional", "medical", "recovery", "family"];
     return issue && supportedIssues.includes(issue)
-      ? `/?issue=${encodeURIComponent(issue)}#providers`
-      : "/#providers";
+      ? `/providers?issue=${encodeURIComponent(issue)}#providers`
+      : "/account";
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {

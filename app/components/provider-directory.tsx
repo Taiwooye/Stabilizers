@@ -9,14 +9,7 @@ import {
   subscribeToDemoSession,
   type DemoAccount,
 } from "./demo-auth";
-
-const regions = [
-  { code: "us", name: "United States", number: "911" },
-  { code: "ca", name: "Canada", number: "911" },
-  { code: "uk", name: "United Kingdom", number: "999" },
-  { code: "au", name: "Australia", number: "000" },
-  { code: "eu", name: "European Union", number: "112" },
-] as const;
+import CallModeIcons from "./call-mode-icons";
 
 const issues = [
   {
@@ -92,7 +85,6 @@ function getServerLocationIssue() {
 }
 
 export default function ProviderDirectory() {
-  const [regionCode, setRegionCode] = useState("");
   const [chosenIssueId, setChosenIssueId] = useState<IssueId | "">("");
   const [providerType, setProviderType] = useState("all");
   const [accountActionError, setAccountActionError] = useState("");
@@ -110,7 +102,6 @@ export default function ProviderDirectory() {
   const issueId = chosenIssueId || (isIssueId(locationIssue) ? locationIssue : "");
 
   const selectedIssue = issues.find((issue) => issue.id === issueId);
-  const region = regions.find((item) => item.code === regionCode);
   const issueProviders = selectedIssue
     ? sampleProviders.filter((provider) => provider.issues.includes(selectedIssue.id))
     : [];
@@ -128,60 +119,6 @@ export default function ProviderDirectory() {
 
   return (
     <section aria-labelledby="providers-title" className="providers-section" id="providers">
-      <div aria-labelledby="emergency-title" className="emergency-banner" id="emergency-call">
-        <div className="emergency-banner-copy">
-          <span aria-hidden="true" className="emergency-alert-mark">!</span>
-          <div>
-            <p className="eyebrow">NEED HELP RIGHT NOW?</p>
-            <h2 id="emergency-title">Call emergency services for an emergency.</h2>
-            <p>
-              If someone has collapsed, is unresponsive, or is bleeding heavily,
-              call your local emergency number now. Don&apos;t wait for a provider
-              listing or sign in. Stabilizers is not an emergency service.
-            </p>
-          </div>
-        </div>
-        <div className="emergency-call-controls">
-          <label htmlFor="emergency-region">Your current location</label>
-          <select
-            id="emergency-region"
-            onChange={(event) => setRegionCode(event.target.value)}
-            value={regionCode}
-          >
-            <option value="">Select a region</option>
-            {regions.map((item) => (
-              <option key={item.code} value={item.code}>
-                {item.name} — {item.number}
-              </option>
-            ))}
-            <option value="other">Other / not listed</option>
-          </select>
-          {region ? (
-            <p className="emergency-call-caption" aria-live="polite">
-              Use your device&apos;s Emergency Call option or an official local
-              source; don&apos;t guess an emergency number.
-            </p>
-          ) : regionCode === "other" ? (
-            <p className="emergency-call-caption" aria-live="polite">
-              Use your device&apos;s Emergency Call option or an official local
-              source; don&apos;t guess an emergency number.
-            </p>
-          ) : (
-            <p className="emergency-call-caption" aria-live="polite">
-              Select your current region to see its emergency call option.
-            </p>
-          )}
-          {region && (
-            <a
-              className="button button-emergency emergency-call-button"
-              href={`tel:${region.number.replace(/[^\d+]/g, "")}`}
-            >
-              Call {region.number} <span aria-hidden="true">&#8599;</span>
-            </a>
-          )}
-        </div>
-      </div>
-
       <div className="providers-heading">
         <p className="eyebrow">FIND THE RIGHT KIND OF SUPPORT</p>
         <h2 id="providers-title">What kind of help are you looking for?</h2>
@@ -298,6 +235,7 @@ export default function ProviderDirectory() {
                         <strong>{provider.name}</strong>
                         <small>{provider.profession} · {provider.focus}</small>
                         <small>Fictional profile · not registered or available</small>
+                        <CallModeIcons />
                       </span>
                       <span className="sample-provider-type">{provider.profession}</span>
                     </li>

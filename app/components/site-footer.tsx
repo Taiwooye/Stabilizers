@@ -6,7 +6,8 @@ export default function SiteFooter() {
     <footer className="site-footer">
       <Brand footer />
       <p>Not a substitute for emergency services or professional medical advice.</p>
-      <Link href="/#safety">Safety &amp; privacy</Link>
+      <Link href="/about">About &amp; safety</Link>
+      <Link href="/how-it-works">How it works</Link>
     </footer>
   );
 }
